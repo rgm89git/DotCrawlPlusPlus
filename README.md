@@ -98,3 +98,8 @@ dotcrawlplusplus(clip C, int "dotstyle", float "dotblend", float "dotscale", int
     - [FFT3DFilter](https://github.com/pinterf/fft3dfilter/releases) *(need FFTW 3.3.5 dlls)*
     - [GRunT](https://github.com/pinterf/GRunT/releases)
     - [TEMmod](https://github.com/Asd-g/TEMmod/releases)
+
+## Initial Contributions
+
+- **@SaurusX** *(Doom9)* - (Helping with rainbowing)
+- **@zarxrax** *(Doom9)* - (Contributing with rainbowing)
