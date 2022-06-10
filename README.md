@@ -1,6 +1,15 @@
 # <div align="center"><img src="https://user-images.githubusercontent.com/40833244/173114548-6b44afd5-8bd7-4e70-877e-864e99e36803.png" /></div>
 #### <p align="center">***A modernization of DotCrawlPlus, an filter that emulates analog artifacts.***</p>
 
+<div align="center">
+
+[![Release version](https://img.shields.io/github/v/release/rgm89git/DotCrawlPlusPlus?color=blue&label=&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/rgm89git/DotCrawlPlusPlus/total?style=for-the-badge&color=blue)](https://github.com/rgm89git/DotCrawlPlusPlus/releases/latest)
+[![Commits](https://img.shields.io/github/commit-activity/m/rgm89git/DotCrawlPlusPlus?label=commits&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/commits)
+[![Last Commit](https://img.shields.io/github/last-commit/rgm89git/DotCrawlPlusPlus/master?label=&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/commits)
+
+</div>
+
 ## Demos
 **Colorbars w/ Overscan Borders**
 
