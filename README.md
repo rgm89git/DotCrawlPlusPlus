@@ -8,6 +8,8 @@
 [![Commits](https://img.shields.io/github/commit-activity/m/rgm89git/DotCrawlPlusPlus?label=commits&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/commits)
 [![Last Commit](https://img.shields.io/github/last-commit/rgm89git/DotCrawlPlusPlus/master?label=&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/commits)
 
+*Original by: [raffriff42](https://forum.doom9.org/showthread.php?t=170433)*
+
 </div>
 
 ## Demos
