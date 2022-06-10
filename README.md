@@ -58,6 +58,10 @@ dcpp_preset(clip C, string "preset", float "dots", float "rainbow", bool "showpr
                 (default depends on preset)
 @ rainbow   - rainbow effect amount
                 (default depends on preset)
+@ cblur    - chroma blur amount
+                (default depends on preset)
+@ lblur    - luma blur amount
+                (default depends on preset)
 @ showpreset - if true, show the preset name as a Subtitle
                 (default false)
 @ showargs  - if true, show the arguments as a Subtitle
