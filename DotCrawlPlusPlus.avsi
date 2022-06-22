@@ -110,6 +110,8 @@ The technical terms are as follows:
 ##                 (default depends on preset)
 ## @ rainbow  - rainbow effect amount
 ##                 (default depends on preset)
+## @ rb_strength  - rainbow effect mask strength
+##                 (default 17)
 ## @ cblur    - chroma blur amount
 ##                 (default depends on preset)
 ## @ lblur    - luma blur amount
@@ -122,7 +124,7 @@ The technical terms are as follows:
 ##                 (default 4)
 ##
 function dcpp_preset(clip C, string "preset",
-\            float "dots", float "rainbow", float "cblur", float "lblur", 
+\            float "dots", float "rainbow", int "rb_strength", float "cblur", float "lblur", 
 \            bool "showpreset", bool "showargs", float "threads")
 {
     preset      = Default(preset, "")
@@ -166,6 +168,7 @@ function dcpp_preset(clip C, string "preset",
     \               : (preset=="mild")    ? 0.0
     \               : 0.0)
 	lblur       = Float(Min(Max(0, lblur), 1))
+	rb_strength = Int(Min(Max(0, Default(rb_strength, 17)), 50))
     showpreset  = Default(showpreset, false)
     showargs    = Default(showargs,   false)
 	threads     = Default(threads, 4)
@@ -176,49 +179,49 @@ function dcpp_preset(clip C, string "preset",
     \          dotblend=dots, dotscale=3, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
     \          lnoise=0, cnoise=0, streaking=0,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="bigdot2")
     \     ? dotcrawlplusplus(dotstyle=2,
     \          dotblend=dots, dotscale=2, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
     \          lnoise=0, cnoise=0, streaking=0,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="bigdot1")
     \     ? dotcrawlplusplus(dotstyle=2,
     \          dotblend=dots, dotscale=1.5, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
     \          lnoise=0, cnoise=0, streaking=0,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
 	\ : (preset=="betacam")
 	\     ? dotcrawlplusplus(dotstyle=2,
     \          dotblend=dots, dotscale=1, dotleak=8, 
     \          csub=4, cblur=cblur, lblur=lblur,
     \          lnoise=2, cnoise=2, streaking=0.5,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="heavy")
     \     ? dotcrawlplusplus(dotstyle=0,
     \          dotblend=dots, dotscale=2, dotleak=32, 
     \          csub=4, cblur=cblur, lblur=lblur,
     \          lnoise=22, cnoise=32, streaking=1,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="strong")
     \     ? dotcrawlplusplus(dotstyle=1,
     \          dotblend=dots, dotscale=1.5, dotleak=24, 
     \          csub=4, cblur=cblur, lblur=lblur,
     \          lnoise=4, cnoise=4, streaking=0,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="mild")
     \     ? dotcrawlplusplus(dotstyle=0,
     \          dotblend=dots, dotscale=1, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
     \          lnoise=0, cnoise=0, streaking=0,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="medium" || preset=="")
     \     ? dotcrawlplusplus(dotstyle=0,
     \          dotblend=dots, dotscale=1, dotleak=0, 
     \          csub=2, cblur=cblur, lblur=lblur,
     \          lnoise=2, cnoise=4, streaking=0,
-    \          rainbow=rb, showargs=showargs, threads=threads)
+    \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : Assert(false, "dotcrawlplusplus: unrecognized preset")
 
     return (showpreset==false) ? R
@@ -241,6 +244,7 @@ function dcpp_preset(clip C, string "preset",
 ## @ cnoise    - default 4 (0=bypass; 2=subliminal; 33=VHS)
 ## @ streaking - default 0.0 (1.0=extreme horizontal streaking)
 ## @ rainbow   - rainbow effect opacity (default 0.2)
+## @ rb_strength - rainbow effect mask strength (default 17)
 ## @ showargs  - if true, show the arguments as a Subtitle
 ## @ threads   - cpu threads you want to use (default 4)
 ##
@@ -253,7 +257,7 @@ function dotcrawlplusplus(clip C, int "dotstyle",
 \            float "dotblend", float "dotscale", int "dotleak", 
 \            int "csub", float "cblur", float "lblur",
 \            int "lnoise", int "cnoise", float "streaking",
-\            float "rainbow", bool "showargs", float "threads")
+\            float "rainbow", int "rb_strength", bool "showargs", float "threads")
 {
     Assert(IsClip(C) && IsYV12(C),
     \   "dotcrawlplusplus: clip 'C' must be YV12")
@@ -271,6 +275,7 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     cnoise    =       Min(Max(0, Default(cnoise,    4)),   64)
     streaking = Float(Min(Max(0, Default(streaking, 0)),   1))
     rainbow   = Float(Min(Max(0, Default(rainbow,   0.2)), 1))
+	rb_strength = Int(Min(Max(0, Default(rb_strength, 17)), 50))
     showargs  =                  Default(showargs,  false)
 	threads   = Default(threads, 4)
 
@@ -380,7 +385,7 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     RC = dcpp_makerainbow()
 
     ## 'RM' = 'Rainbow Mask'
-    RM = dcpp_uumidpass()
+    RM = dcpp_uumidpass(rb_strength=rb_strength)
     #RM = (csub<2)         ? RM : RM.mt_expand().Blur(1)
     #RM = RM.Levels(0, 0.2, 220, 0, 255, coring=false).Grayscale()
 
@@ -550,9 +555,10 @@ function dcpp_makerainbow(clip C, float "sat")
 ##################################
 ### "mid pass"
 function dcpp_uumidpass(
-\   clip C, int "tlo", int "thi", bool "setupmode")
+\   clip C, int "rb_strength", int "tlo", int "thi", bool "setupmode")
 {
-    tlo    = Default(tlo, 128)
+    rb_strength = Default(rb_strength, 17)
+	tlo    = Default(tlo, 128)
     thi    = Default(thi, 148)
     setupmode = Default(setupmode, false)
 
@@ -571,7 +577,7 @@ function dcpp_uumidpass(
 	C
 	#TEMmod(threshY=12)
 	
-	b=C.TEMmod(threshY=17).mt_expand
+	b=C.TEMmod(threshY=rb_strength).mt_expand
 
 	btopleft=BilinearResize(b,width,height,src_top=1,src_left=.5).invert()
 	diag=overlay(b,btopleft,mode="subtract")
