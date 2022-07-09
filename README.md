@@ -6,8 +6,9 @@
 [![Release version](https://img.shields.io/github/v/release/rgm89git/DotCrawlPlusPlus?color=blue&label=&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/rgm89git/DotCrawlPlusPlus/total?style=for-the-badge&color=blue)](https://github.com/rgm89git/DotCrawlPlusPlus/releases/latest)
 [![Commits](https://img.shields.io/github/commit-activity/m/rgm89git/DotCrawlPlusPlus?label=commits&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/commits)
-[![Last Commit](https://img.shields.io/github/last-commit/rgm89git/DotCrawlPlusPlus/master?label=&style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/commits)
+[![Last Commit](https://img.shields.io/github/last-commit/rgm89git/DotCrawlPlusPlus?style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/commits)
 [![Doom9 Thread](https://img.shields.io/badge/-DOOM9%20THREAD-blue?style=for-the-badge)](https://forum.doom9.org/showthread.php?t=184188)
+[![License](https://img.shields.io/github/license/rgm89git/DotCrawlPlusPlus?style=for-the-badge)](https://github.com/rgm89git/DotCrawlPlusPlus/blob/main/LICENSE.md)
 
 *Original by: [raffriff42](https://forum.doom9.org/showthread.php?t=170433)*
 
