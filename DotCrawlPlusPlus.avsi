@@ -502,6 +502,65 @@ function dcpp_makedots(clip T, float "offset", int "size")
 }
 
 ##################################
+## Old version of LumaMask for dcpp_halo
+##
+## @ filtered - By default the input of the function is assumed as filtered
+## @ raw      - Define where you want to create the mask from, and thus blend with the filtered clip.
+## @ b        - Limit for 100% black in your mask. [0...255]
+## @ w        - Limit for 100% white in your mask. [0...255]
+## @ upper    - Inverts the mask. By default filtered clip will be passed through the white parts of the mask.
+## @ show     - Shows the mask, which you can directly use with any masking operations on your own.
+##
+function dcpp_halo_lumamask(clip filtered, clip raw, int "b", int "w", bool "upper", bool "show"){
+
+raw      = default(raw, filtered)
+
+LO       = string(default(b, 24))
+HI       = string(default(w, 48))
+upper    = default(upper, false)
+show     = default(show,  false)
+
+
+code     = upper ? "x "+LO+" < 255 x "+HI+" > 0 255 x "+LO+" - 255 "+HI+" "+LO+" - / * - ? ?" : \
+                   "x "+LO+" < 0   x "+HI+" > 255 0 x "+LO+" - 255 "+LO+" "+HI+" - / * - ? ?"
+
+msk      = raw.mt_lut(code,u=-128,v=-128)
+
+show  ?  msk : mt_merge(raw, filtered, msk, luma=true, U=3,V=3)}
+
+##################################
+### create halos
+##
+## PS.: Uses dcpp_halo_lumamask
+##
+## @ bright_halo - bright halo intensity (default 0.4)
+## @ dark_halo   - dark halo intensity (default 0.5)
+##
+function dcpp_halo(clip C, float "bright_halo", float "dark_halo"){
+
+	bright_halo_value = Default(bright_halo, .4)
+	dark_halo_value = Default(dark_halo, .5)
+	
+	C
+	
+	a=C
+	bright_halo_mask=C.TEMmod(threshY=17).mt_expand.mt_expand.mt_expand        #mask for bright halos
+	dark_halo_mask=C.TEMmod(threshY=17).mt_expand                #mask for dark halos
+	halo_bright3=dcpp_halo_lumamask(a,a,b=170,w=230, show=true).levels(0,1,50,0,255,false).mt_expand(u=-128,v=-128).mt_binarize()    #luma mask to remove later
+	halo_dark3=dcpp_halo_lumamask(a,a,b=0,w=65, show=true, upper=true).mt_inflate().mt_binarize(40)
+	#b=overlay(b,bright3,mode="subtract")        #remove bright sections from bright halos
+	halo_d=overlay(bright_halo_mask,dark_halo_mask,mode="subtract").mt_deflate()    #hollow out mask for dark halos by subtracting area for brights
+	#d=overlay(d,bright3,mode="subtract")        #remove bright sections from dark halo mask
+	halo_d=overlay(halo_d,halo_dark3,mode="subtract")        #REMOVE DARK SECTIONS FROM DARK MASK
+	#b=overlay(b,dark3,mode="subtract")        #REMOVE DARK SECTIONS FROM BRIGHT MASK
+	dark_halo=C.generalconvolution(matrix="0 0 0 0 1 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 -2 0 0 0 0 0 0 0 0 2 0 0 0 0 1 -1 3 2 1 2 -3 -1 1 0 0 0 0 2 0 0 0 0 0 0 0 0 -2 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 1 0 0 0 0",chroma=false)
+	bright_halo=C.generalconvolution(matrix="0 0 -2 0 0 0 0 2 0 0 -2 2 1 2 -2 0 0 2 0 0 0 0 -2 0 0",chroma=false)
+	overlay(C,bright_halo,mask=bright_halo_mask,opacity=bright_halo_value)             #FINAL BRIGHT HALO STRENGTH
+	overlay(C,dark_halo,mask=halo_d,opacity=dark_halo_value)              #FINAL DARK HALO STRENGTH
+
+}
+
+##################################
 ### generate a rainbow pattern
 ##
 ## @ sat    - chroma intensity (default 1.0)
