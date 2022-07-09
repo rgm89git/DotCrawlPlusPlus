@@ -104,6 +104,13 @@ dotcrawlplusplus(clip C, int "dotstyle", float "dotblend", float "dotscale", int
 @ threads   - cpu threads you want to use (default 4)
 ```
 
+**You can also create halo artifacts:**
+```
+dcpp_halo(clip C, float "bright_halo", float "dark_halo")
+@ bright_halo - bright halo intensity (default 0.4)
+@ dark_halo   - dark halo intensity (default 0.5)
+```
+
 ## Requisites
 
 - **[AviSynth+](https://github.com/AviSynth/AviSynthPlus/releases)**
@@ -118,3 +125,11 @@ dotcrawlplusplus(clip C, int "dotstyle", float "dotblend", float "dotscale", int
 
 - **@SaurusX** *(Doom9)* - (Helping with rainbowing)
 - **@zarxrax** *(Doom9)* - (Contributing with rainbowing)
+
+## Credits
+
+- **@Dogway** (LumaMask - old version)
+
+## License
+
+This GitHub repository is licensed under the GNU General Public License v3.0 (GPL3).
