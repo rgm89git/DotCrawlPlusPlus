@@ -70,6 +70,8 @@ dcpp_preset(clip C, string "preset", float "dots", float "rainbow", bool "showpr
                 (default depends on preset)
 @ rainbow   - rainbow effect amount
                 (default depends on preset)
+@ rb_strength  - rainbow effect mask strength
+                (default 17)
 @ cblur    - chroma blur amount
                 (default depends on preset)
 @ lblur    - luma blur amount
@@ -97,8 +99,16 @@ dotcrawlplusplus(clip C, int "dotstyle", float "dotblend", float "dotscale", int
 @ cnoise    - default 4 (0=bypass; 2=subliminal; 33=VHS)
 @ streaking - default 0.0 (1.0=extreme horizontal streaking)
 @ rainbow   - rainbow effect opacity (default 0.2)
+@ rb_strength - rainbow effect mask strength (default 17)
 @ showargs  - if true, show the arguments as a Subtitle
 @ threads   - cpu threads you want to use (default 4)
+```
+
+**You can also create halo artifacts:**
+```
+dcpp_halo(clip C, float "bright_halo", float "dark_halo")
+@ bright_halo - bright halo intensity (default 0.4)
+@ dark_halo   - dark halo intensity (default 0.5)
 ```
 
 ## Requisites
@@ -115,3 +125,11 @@ dotcrawlplusplus(clip C, int "dotstyle", float "dotblend", float "dotscale", int
 
 - **@SaurusX** *(Doom9)* - (Helping with rainbowing)
 - **@zarxrax** *(Doom9)* - (Contributing with rainbowing)
+
+## Credits
+
+- **@Dogway** (LumaMask - old version)
+
+## License
+
+This GitHub repository is licensed under the GNU General Public License v3.0 (GPL3).
