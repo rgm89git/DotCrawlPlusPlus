@@ -157,7 +157,7 @@ function dcpp_preset(clip C, string "preset",
     \               : (preset=="strong")  ? 0.5
     \               : (preset=="mild")    ? 0.0
     \               : 0.0)
-	cblur       = Float(Min(Max(0, cblur), 1))
+	cblur       = Float(Min(Max(0, cblur), 1.5))
 	lblur       = Default(lblur,
     \                 (preset=="bigdot3") ? 0.0
     \               : (preset=="bigdot2") ? 0.0
@@ -167,7 +167,7 @@ function dcpp_preset(clip C, string "preset",
     \               : (preset=="strong")  ? 0.0
     \               : (preset=="mild")    ? 0.0
     \               : 0.0)
-	lblur       = Float(Min(Max(0, lblur), 1))
+	lblur       = Float(Min(Max(0, lblur), 1.5))
 	rb_strength = Int(Min(Max(0, Default(rb_strength, 40)), 50))
     showpreset  = Default(showpreset, false)
     showargs    = Default(showargs,   false)
@@ -269,8 +269,8 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     dotleak   =       Min(Max(0, Default(dotleak,   0)),   255)
     dotscale  = Float(Min(Max(1, Default(dotscale,  1)),   4))
     csub      =       Min(Max(1, Default(csub,      2)),   4)
-    cblur     = Float(Min(Max(0, Default(cblur,     0.3)), 1))
-    lblur     = Float(Min(Max(0, Default(lblur,     0.3)), 1))
+    cblur     = Float(Min(Max(0, Default(cblur,     0.3)), 1.5))
+    lblur     = Float(Min(Max(0, Default(lblur,     0.3)), 1.5))
     lnoise    =       Min(Max(0, Default(lnoise,    4)),   64)
     cnoise    =       Min(Max(0, Default(cnoise,    4)),   64)
     streaking = Float(Min(Max(0, Default(streaking, 0)),   1))
