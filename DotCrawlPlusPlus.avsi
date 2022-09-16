@@ -132,7 +132,7 @@ function dcpp_preset(clip C, string "preset",
     \                 (preset=="bigdot3") ? 0.7
     \               : (preset=="bigdot2") ? 0.7
     \               : (preset=="bigdot1") ? 0.7
-	\               : (preset=="betacam") ? 0.8
+	\               : (preset=="betacam") ? 1.0
     \               : (preset=="heavy")   ? 1.0
     \               : (preset=="strong")  ? 1.0
     \               : (preset=="mild")    ? 0.7
@@ -380,7 +380,7 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     \       : (dotstyle==2) ? Overlay(Tweak(bright=20, sat=0.5), x=1, y=1)
     \       : last
 
-    Overlay(dotclip, mask=dotmask, mode=dotmode, opacity=dotblend)
+    Overlay(dotclip, mask=dotmask, mode=dotmode, opacity=(dotblend*0.1))
 
     ## rainbow ###################################
 
