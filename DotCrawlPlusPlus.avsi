@@ -111,7 +111,7 @@ The technical terms are as follows:
 ## @ rainbow  - rainbow effect amount
 ##                 (default depends on preset)
 ## @ rb_strength  - rainbow effect mask strength
-##                 (default 17)
+##                 (default 40)
 ## @ cblur    - chroma blur amount
 ##                 (default depends on preset)
 ## @ lblur    - luma blur amount
@@ -142,7 +142,7 @@ function dcpp_preset(clip C, string "preset",
     \                 (preset=="bigdot3") ? 0.3
     \               : (preset=="bigdot2") ? 0.3
     \               : (preset=="bigdot1") ? 0.3
-	\               : (preset=="betacam") ? 0.4
+	\               : (preset=="betacam") ? 0.2
     \               : (preset=="heavy")   ? 1.0
     \               : (preset=="strong")  ? 0.6
     \               : (preset=="mild")    ? 0.3
@@ -152,7 +152,7 @@ function dcpp_preset(clip C, string "preset",
     \                 (preset=="bigdot3") ? 0.0
     \               : (preset=="bigdot2") ? 0.0
     \               : (preset=="bigdot1") ? 0.0
-	\               : (preset=="betacam") ? 0.0
+	\               : (preset=="betacam") ? 0.1
     \               : (preset=="heavy")   ? 1.0
     \               : (preset=="strong")  ? 0.5
     \               : (preset=="mild")    ? 0.0
@@ -162,13 +162,13 @@ function dcpp_preset(clip C, string "preset",
     \                 (preset=="bigdot3") ? 0.0
     \               : (preset=="bigdot2") ? 0.0
     \               : (preset=="bigdot1") ? 0.0
-	\               : (preset=="betacam") ? 0.0
+	\               : (preset=="betacam") ? 0.05
     \               : (preset=="heavy")   ? 0.5
     \               : (preset=="strong")  ? 0.0
     \               : (preset=="mild")    ? 0.0
     \               : 0.0)
 	lblur       = Float(Min(Max(0, lblur), 1))
-	rb_strength = Int(Min(Max(0, Default(rb_strength, 17)), 50))
+	rb_strength = Int(Min(Max(0, Default(rb_strength, 40)), 50))
     showpreset  = Default(showpreset, false)
     showargs    = Default(showargs,   false)
 	threads     = Default(threads, 4)
@@ -193,10 +193,10 @@ function dcpp_preset(clip C, string "preset",
     \          lnoise=0, cnoise=0, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
 	\ : (preset=="betacam")
-	\     ? dotcrawlplusplus(dotstyle=2,
-    \          dotblend=dots, dotscale=1, dotleak=8, 
-    \          csub=4, cblur=cblur, lblur=lblur,
-    \          lnoise=2, cnoise=2, streaking=0.5,
+	\     ? dotcrawlplusplus(dotstyle=0,
+    \          dotblend=dots, dotscale=1, dotleak=0, 
+    \          csub=3, cblur=cblur, lblur=lblur,
+    \          lnoise=2, cnoise=2, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="heavy")
     \     ? dotcrawlplusplus(dotstyle=0,
@@ -244,7 +244,7 @@ function dcpp_preset(clip C, string "preset",
 ## @ cnoise    - default 4 (0=bypass; 2=subliminal; 33=VHS)
 ## @ streaking - default 0.0 (1.0=extreme horizontal streaking)
 ## @ rainbow   - rainbow effect opacity (default 0.2)
-## @ rb_strength - rainbow effect mask strength (default 17)
+## @ rb_strength - rainbow effect mask strength (default 40)
 ## @ showargs  - if true, show the arguments as a Subtitle
 ## @ threads   - cpu threads you want to use (default 4)
 ##
@@ -259,8 +259,8 @@ function dotcrawlplusplus(clip C, int "dotstyle",
 \            int "lnoise", int "cnoise", float "streaking",
 \            float "rainbow", int "rb_strength", bool "showargs", float "threads")
 {
-    Assert(IsClip(C) && IsYV12(C),
-    \   "dotcrawlplusplus: clip 'C' must be YV12")
+    Assert(IsClip(C) && (IsYV12(C) || Is444(C)),
+    \   "dotcrawlplusplus: clip 'C' must be YV12 or YV24")
     Assert((C.Width % 8)==0 && (C.Height % 8)==0,
     \   "dotcrawlplusplus: clip 'C' resolution is not mod-8")
 
@@ -317,9 +317,9 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     \       .AddGrainC(lnoise, hcorr=0.25, vcorr=0.125)
     \       .convert_to_Y8()
 
-    US = (cblur<0.01) ? US : US.Blur(cblur)
-    VS = (cblur<0.01) ? VS : VS.Blur(cblur)
-    Y  = (lblur<0.01) ? Y  : Y.Blur(lblur)
+    US = (cblur<0.01) ? US : US.Blur(cblur,0)
+    VS = (cblur<0.01) ? VS : VS.Blur(cblur,0)
+    Y  = (lblur<0.01) ? Y  : Y.Blur(lblur,0)
 
     US = US.BilinearResize(Width/2, Height/2)
     VS = VS.BilinearResize(Width/2, Height/2)
@@ -368,14 +368,17 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     dotcrawl = dotcrawl.UUSize2(EC.Width, EC.Height) 
 #return dotcrawl
     dotmask = EC.mt_logic(dotcrawl, "min")
+	#dotmask = EC.TEMmod()
 #return dotmask.Grayscale()
 
+    #return dotmask
+
     dotoffset = ((dotscale>1.5) ? 2 : 1)
-    dotmode   = (dotstyle==0) ? "luma" : "blend"  
+    dotmode   = (dotstyle==0) ? "add" : "blend"  
 
     dotclip = (dotstyle==1) ? Overlay(Last, x=dotoffset, y=dotoffset)
     \       : (dotstyle==2) ? Overlay(Tweak(bright=20, sat=0.5), x=1, y=1)
-    \       : Tweak(bright=20, sat=0.3)
+    \       : last
 
     Overlay(dotclip, mask=dotmask, mode=dotmode, opacity=dotblend)
 
@@ -440,10 +443,10 @@ function dcpp_makedotcrawl(clip T, int "size")
         \ gdots00, gdots25, gdots50, gdots75)
      """)
 
-    SeparateFields.SelectEvery(2, 1).AssumeFrameBased()
-    SeparateFields.SelectEvery(2, 1).AssumeFrameBased()
-    Crop(0, 0, Height*2, 0)
-    Spline16Resize(Width/2, Height)
+    #SeparateFields.SelectEvery(2, 1).AssumeFrameBased()
+    #SeparateFields.SelectEvery(2, 1).AssumeFrameBased()
+    #Crop(0, 0, Height*2, 0)
+    #Spline16Resize(Width/2, Height)
 
     size = (size==2) ? 2
     \    : (size==3) ? 4
@@ -481,14 +484,15 @@ function dcpp_makedots(clip T, float "offset", int "size")
     off_i = Round(offset * 2.0 * size)
 
     T = T.ConvertToYV12().Loop()
-    R = mt_logic(
-    \      mt_lutspa(T, mode="absolute", chroma="-128",
-    \         expr=("""((((y/(2*$s))%2)>0) ? cos((x/$s)*pi) : -1*(cos((x/$s)*pi)))*108+126""")
-    \              .StrReplace("$s", String(size)).mt_polish),
-    \      mt_lutspa(T, mode="absolute", chroma="-128",
-    \        expr=("cos((y/$s)*pi)*108+126")
-    \             .StrReplace("$s", String(size)).mt_polish),
-    \      "andn")
+    #R = mt_logic(
+    #\      mt_lutspa(T, mode="absolute", chroma="-128",
+    #\         expr=("""((((y/(2*$s))%2)>0) ? cos((x/$s)*pi) : -1*(cos((x/$s)*pi)))*108+126""")
+    #\              .StrReplace("$s", String(size)).mt_polish),
+    #\      mt_lutspa(T, mode="absolute", chroma="-128",
+    #\        expr=("cos((y/$s)*pi)*108+126")
+    #\             .StrReplace("$s", String(size)).mt_polish),
+    #\      "andn")
+	R = mt_lutspa(T, mode="absolute", chroma="-128", expr=("x 4 % 2 < 0 1 ? y 4 % 2 < 0 1 ? + 1 == 0 255 ?"))
 
     R = R.ConvertToYV24()
     R = (off_i==0) ? R
@@ -543,21 +547,21 @@ function dcpp_halo(clip C, float "bright_halo", float "dark_halo"){
 	
 	C
 	
-	a=C
-	bright_halo_mask=C.TEMmod(threshY=17).mt_expand.mt_expand.mt_expand        #mask for bright halos
-	dark_halo_mask=C.TEMmod(threshY=17).mt_expand                #mask for dark halos
+	a=last
+	halo_b_mask=last.TEMmod(threshY=17).mt_expand.mt_expand.mt_expand        #mask for bright halos
+	halo_d_mask=last.TEMmod(threshY=17).mt_expand                #mask for dark halos
 	halo_bright3=dcpp_halo_lumamask(a,a,b=170,w=230, show=true).levels(0,1,50,0,255,false).mt_expand(u=-128,v=-128).mt_binarize()    #luma mask to remove later
 	halo_dark3=dcpp_halo_lumamask(a,a,b=0,w=65, show=true, upper=true).mt_inflate().mt_binarize(40)
 	#b=overlay(b,bright3,mode="subtract")        #remove bright sections from bright halos
-	halo_d=overlay(bright_halo_mask,dark_halo_mask,mode="subtract").mt_deflate()    #hollow out mask for dark halos by subtracting area for brights
+	halo_d=overlay(halo_b_mask,halo_d_mask,mode="subtract").mt_deflate()    #hollow out mask for dark halos by subtracting area for brights
 	#d=overlay(d,bright3,mode="subtract")        #remove bright sections from dark halo mask
 	halo_d=overlay(halo_d,halo_dark3,mode="subtract")        #REMOVE DARK SECTIONS FROM DARK MASK
 	#b=overlay(b,dark3,mode="subtract")        #REMOVE DARK SECTIONS FROM BRIGHT MASK
-	dark_halo=C.generalconvolution(matrix="0 0 0 0 1 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 -2 0 0 0 0 0 0 0 0 2 0 0 0 0 1 -1 3 2 1 2 -3 -1 1 0 0 0 0 2 0 0 0 0 0 0 0 0 -2 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 1 0 0 0 0",chroma=false)
-	bright_halo=C.generalconvolution(matrix="0 0 -2 0 0 0 0 2 0 0 -2 2 1 2 -2 0 0 2 0 0 0 0 -2 0 0",chroma=false)
-	overlay(C,bright_halo,mask=bright_halo_mask,opacity=bright_halo_value)             #FINAL BRIGHT HALO STRENGTH
-	overlay(C,dark_halo,mask=halo_d,opacity=dark_halo_value)              #FINAL DARK HALO STRENGTH
-
+	dark_halo=generalconvolution(matrix="0 0 0 0 1 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 -2 0 0 0 0 0 0 0 0 2 0 0 0 0 1 -1 3 2 1 2 -3 -1 1 0 0 0 0 2 0 0 0 0 0 0 0 0 -2 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 1 0 0 0 0",chroma=false)
+	bright_halo=generalconvolution(matrix="0 0 -2 0 0 0 0 2 0 0 -2 2 1 2 -2 0 0 2 0 0 0 0 -2 0 0",chroma=false)
+	overlay(last,bright_halo,mask=halo_b_mask,opacity=bright_halo_value)             #FINAL BRIGHT HALO STRENGTH
+	overlay(last,dark_halo,mask=halo_d,opacity=dark_halo_value)              #FINAL DARK HALO STRENGTH
+	
 }
 
 ##################################
@@ -616,7 +620,7 @@ function dcpp_makerainbow(clip C, float "sat")
 function dcpp_uumidpass(
 \   clip C, int "rb_strength", int "tlo", int "thi", bool "setupmode")
 {
-    rb_strength = Default(rb_strength, 17)
+    rb_strength = Default(rb_strength, 40)
 	tlo    = Default(tlo, 128)
     thi    = Default(thi, 148)
     setupmode = Default(setupmode, false)
