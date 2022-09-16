@@ -152,7 +152,7 @@ function dcpp_preset(clip C, string "preset",
     \                 (preset=="bigdot3") ? 0.0
     \               : (preset=="bigdot2") ? 0.0
     \               : (preset=="bigdot1") ? 0.0
-	\               : (preset=="betacam") ? 0.1
+	\               : (preset=="betacam") ? 0.2
     \               : (preset=="heavy")   ? 1.0
     \               : (preset=="strong")  ? 0.5
     \               : (preset=="mild")    ? 0.0
@@ -162,7 +162,7 @@ function dcpp_preset(clip C, string "preset",
     \                 (preset=="bigdot3") ? 0.0
     \               : (preset=="bigdot2") ? 0.0
     \               : (preset=="bigdot1") ? 0.0
-	\               : (preset=="betacam") ? 0.05
+	\               : (preset=="betacam") ? 0.4
     \               : (preset=="heavy")   ? 0.5
     \               : (preset=="strong")  ? 0.0
     \               : (preset=="mild")    ? 0.0
