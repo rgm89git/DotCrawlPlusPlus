@@ -116,6 +116,8 @@ The technical terms are as follows:
 ##                 (default depends on preset)
 ## @ lblur    - luma blur amount
 ##                 (default depends on preset)
+## @ emode    - edge mask mode
+##                 (default 2)
 ## @ showpreset - if true, show the preset name as a Subtitle
 ##                 (default false)
 ## @ showargs  - if true, show the arguments as a Subtitle
@@ -125,7 +127,7 @@ The technical terms are as follows:
 ##
 function dcpp_preset(clip C, string "preset",
 \            float "dots", float "rainbow", int "rb_strength", float "cblur", float "lblur", 
-\            bool "showpreset", bool "showargs", float "threads")
+\            int "emode", bool "showpreset", bool "showargs", float "threads")
 {
     preset      = Default(preset, "")
     dots        = Default(dots,
@@ -168,6 +170,7 @@ function dcpp_preset(clip C, string "preset",
     \               : (preset=="mild")    ? 0.0
     \               : 0.0)
 	lblur       = Float(Min(Max(0, lblur), 1.5))
+	emode = Int(Min(Max(0, Default(emode, 2)), 5))
 	rb_strength = Int(Min(Max(0, Default(rb_strength, 40)), 50))
     showpreset  = Default(showpreset, false)
     showargs    = Default(showargs,   false)
@@ -178,49 +181,49 @@ function dcpp_preset(clip C, string "preset",
     \     ? dotcrawlplusplus(dotstyle=2,
     \          dotblend=dots, dotscale=3, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
-    \          lnoise=0, cnoise=0, streaking=0,
+    \          lnoise=0, cnoise=0, emode=emode, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="bigdot2")
     \     ? dotcrawlplusplus(dotstyle=2,
     \          dotblend=dots, dotscale=2, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
-    \          lnoise=0, cnoise=0, streaking=0,
+    \          lnoise=0, cnoise=0, emode=emode, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="bigdot1")
     \     ? dotcrawlplusplus(dotstyle=2,
     \          dotblend=dots, dotscale=1.5, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
-    \          lnoise=0, cnoise=0, streaking=0,
+    \          lnoise=0, cnoise=0, emode=emode, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
 	\ : (preset=="betacam")
 	\     ? dotcrawlplusplus(dotstyle=0,
     \          dotblend=dots, dotscale=1, dotleak=0, 
     \          csub=3, cblur=cblur, lblur=lblur,
-    \          lnoise=2, cnoise=2, streaking=0,
+    \          lnoise=2, cnoise=2, emode=emode, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="heavy")
     \     ? dotcrawlplusplus(dotstyle=0,
     \          dotblend=dots, dotscale=2, dotleak=32, 
     \          csub=4, cblur=cblur, lblur=lblur,
-    \          lnoise=22, cnoise=32, streaking=1,
+    \          lnoise=22, cnoise=32, emode=emode, streaking=1,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="strong")
     \     ? dotcrawlplusplus(dotstyle=1,
     \          dotblend=dots, dotscale=1.5, dotleak=24, 
     \          csub=4, cblur=cblur, lblur=lblur,
-    \          lnoise=4, cnoise=4, streaking=0,
+    \          lnoise=4, cnoise=4, emode=emode, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="mild")
     \     ? dotcrawlplusplus(dotstyle=0,
     \          dotblend=dots, dotscale=1, dotleak=0, 
     \          csub=1, cblur=cblur, lblur=lblur,
-    \          lnoise=0, cnoise=0, streaking=0,
+    \          lnoise=0, cnoise=0, emode=emode, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : (preset=="medium" || preset=="")
     \     ? dotcrawlplusplus(dotstyle=0,
     \          dotblend=dots, dotscale=1, dotleak=0, 
     \          csub=2, cblur=cblur, lblur=lblur,
-    \          lnoise=2, cnoise=4, streaking=0,
+    \          lnoise=2, cnoise=4, emode=emode, streaking=0,
     \          rainbow=rb, rb_strength=rb_strength, showargs=showargs, threads=threads)
     \ : Assert(false, "dotcrawlplusplus: unrecognized preset")
 
@@ -242,6 +245,8 @@ function dcpp_preset(clip C, string "preset",
 ## @ lblur     - default 0.3
 ## @ lnoise    - default 4 (0=bypass; 2=subliminal; 22-33=VHS)
 ## @ cnoise    - default 4 (0=bypass; 2=subliminal; 33=VHS)
+## @ emode     - edge mask mode
+##                 (default 2, mt_edge modes)
 ## @ streaking - default 0.0 (1.0=extreme horizontal streaking)
 ## @ rainbow   - rainbow effect opacity (default 0.2)
 ## @ rb_strength - rainbow effect mask strength (default 40)
@@ -256,7 +261,7 @@ function dcpp_preset(clip C, string "preset",
 function dotcrawlplusplus(clip C, int "dotstyle",
 \            float "dotblend", float "dotscale", int "dotleak", 
 \            int "csub", float "cblur", float "lblur",
-\            int "lnoise", int "cnoise", float "streaking",
+\            int "lnoise", int "cnoise", int "emode", float "streaking",
 \            float "rainbow", int "rb_strength", bool "showargs", float "threads")
 {
     Assert(IsClip(C) && (IsYV12(C) || Is444(C)),
@@ -273,6 +278,7 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     lblur     = Float(Min(Max(0, Default(lblur,     0.3)), 1.5))
     lnoise    =       Min(Max(0, Default(lnoise,    4)),   64)
     cnoise    =       Min(Max(0, Default(cnoise,    4)),   64)
+	emode     =       Min(Max(0, Default(emode,     2)),   5)
     streaking = Float(Min(Max(0, Default(streaking, 0)),   1))
     rainbow   = Float(Min(Max(0, Default(rainbow,   0.2)), 1))
 	rb_strength = Int(Min(Max(0, Default(rb_strength, 17)), 50))
@@ -288,8 +294,10 @@ function dotcrawlplusplus(clip C, int "dotstyle",
     \ + "\n lblur="      + StrinF(lblur)
     \ + "\n lnoise="     + String(lnoise)
     \ + "\n cnoise="     + String(cnoise)
+	\ + "\n emode="     + String(emode)
     \ + "\n streaking="  + StrinF(streaking)
-    \ + "\n rainbow="    + StrinF(rainbow) ,
+    \ + "\n rainbow="    + StrinF(rainbow)
+	\ + "\n rb_strength="    + String(rb_strength) ,
     \ lsp=0, align=4, x=-1, y=-1,
     \ text_color=$ccffffff, halo_color=$cc000000)
 	
@@ -331,10 +339,17 @@ function dotcrawlplusplus(clip C, int "dotstyle",
 
     #emode="laplace" ## (least sensitive)
     #emode="roberts"
-    emode="cartoon"
+    #emode="cartoon"
     #emode="sobel"
     #emode="min/max"
     #emode="prewitt" ## (most sensitive)
+	
+	emode = (emode==1) ? "roberts"
+    \    : (emode==2) ? "cartoon"
+    \    : (emode==3) ? "sobel"
+    \    : (emode==4) ? "min/max"
+    \    : (emode==5) ? "prewitt"
+    \    : "laplace"
 
     ## 'EU' = 'edge mask, U channel'
     EU = US.mt_edge(mode=emode).convert_to_Y8()
